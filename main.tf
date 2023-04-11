@@ -1,9 +1,12 @@
 /*
 Copyright 2019 The KubeOne Authors.
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
+
     http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,22 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-provider "hcloud" {}
-
 locals {
   kubeapi_endpoint   = var.disable_kubeapi_loadbalancer ? hcloud_server_network.control_plane.0.ip : hcloud_load_balancer.load_balancer.0.ipv4
   loadbalancer_count = var.disable_kubeapi_loadbalancer ? 0 : 1
-  image              = var.image == "" ? var.image_references[var.os].image_name : var.image
-  worker_os          = var.worker_os == "" ? var.image_references[var.os].worker_os : var.worker_os
-  ssh_username       = var.ssh_username == "" ? var.image_references[var.os].ssh_username : var.ssh_username
-
-  cluster_autoscaler_min_replicas = var.cluster_autoscaler_min_replicas > 0 ? var.cluster_autoscaler_min_replicas : var.initial_machinedeployment_replicas
-  cluster_autoscaler_max_replicas = var.cluster_autoscaler_max_replicas > 0 ? var.cluster_autoscaler_max_replicas : var.initial_machinedeployment_replicas
-}
-
-resource "hcloud_ssh_key" "kubeone" {
-  name       = "kubeone-${var.cluster_name}"
-  public_key = file(var.ssh_public_key_file)
 }
 
 resource "hcloud_network" "net" {
@@ -75,12 +65,13 @@ resource "hcloud_firewall" "cluster" {
   }
 
   rule {
-    description = "allow SSH from any"
+    description = "allow SSH from admin IPs"
     direction   = "in"
     protocol    = "tcp"
     port        = "22"
     source_ips = [
-      "0.0.0.0/0",
+      "82.65.223.67/32",        # Renaud
+      "2a01:e0a:9b2:b311::/64", # Renaud
     ]
   }
 
@@ -99,11 +90,11 @@ resource "hcloud_network_subnet" "kubeone" {
   network_id   = hcloud_network.net.id
   type         = "server"
   network_zone = var.network_zone
-  ip_range     = var.ip_range
+  ip_range     = var.ip_range_cloud
 }
 
 resource "hcloud_server_network" "control_plane" {
-  count     = var.control_plane_vm_count
+  count     = var.control_plane_replicas
   server_id = element(hcloud_server.control_plane.*.id, count.index)
   subnet_id = hcloud_network_subnet.kubeone.id
 }
@@ -118,20 +109,25 @@ resource "hcloud_placement_group" "control_plane" {
 }
 
 resource "hcloud_server" "control_plane" {
-  count              = var.control_plane_vm_count
+  count              = var.control_plane_replicas
   name               = "${var.cluster_name}-control-plane-${count.index + 1}"
   server_type        = var.control_plane_type
-  image              = local.image
-  location           = var.datacenter
+  image              = var.image
+  location           = element(var.control_plane_datacenters, count.index % (length(var.control_plane_datacenters)))
   placement_group_id = hcloud_placement_group.control_plane.id
 
-  ssh_keys = [
-    hcloud_ssh_key.kubeone.id,
-  ]
+  ssh_keys = var.ssh_keys
 
   labels = {
     "kubeone_cluster_name" = var.cluster_name
     "role"                 = "api"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      ssh_keys
+    ]
+    prevent_destroy = true
   }
 }
 
