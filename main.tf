@@ -65,13 +65,12 @@ resource "hcloud_firewall" "cluster" {
   }
 
   rule {
-    description = "allow SSH from admin IPs"
+    description = "allow SSH from any"
     direction   = "in"
     protocol    = "tcp"
     port        = "22"
     source_ips = [
-      "82.65.223.67/32",        # Renaud
-      "2a01:e0a:9b2:b311::/64", # Renaud
+      "0.0.0.0/0"
     ]
   }
 
