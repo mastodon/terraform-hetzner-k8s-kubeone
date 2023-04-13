@@ -69,9 +69,7 @@ resource "hcloud_firewall" "cluster" {
     direction   = "in"
     protocol    = "tcp"
     port        = "22"
-    source_ips = [
-      "0.0.0.0/0"
-    ]
+    source_ips = var.control_plane_source_ips
   }
 
   rule {

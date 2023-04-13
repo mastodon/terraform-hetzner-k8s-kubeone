@@ -119,6 +119,11 @@ variable "ip_range_cloud" {
   default     = "192.168.0.0/17"
 }
 
+variable "control_plane_source_ips" {
+  description = "List of IPs that are allowed to connect to the control instances"
+  type        = list(string)
+}
+
 variable "network_zone" {
   description = "network zone to use for private network"
   type        = string
