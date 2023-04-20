@@ -65,7 +65,7 @@ resource "hcloud_firewall" "cluster" {
   }
 
   rule {
-    description = "allow SSH from any"
+    description = "allow SSH from trusted sources"
     direction   = "in"
     protocol    = "tcp"
     port        = "22"
