@@ -85,6 +85,12 @@ resource "hcloud_firewall" "cluster" {
       "0.0.0.0/0",
     ]
   }
+
+  lifecycle {
+    ignore_changes = [
+      apply_to
+    ]
+  }
 }
 
 resource "hcloud_network_subnet" "kubeone" {
