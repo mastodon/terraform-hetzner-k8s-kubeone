@@ -19,6 +19,10 @@ locals {
   loadbalancer_count = var.disable_kubeapi_loadbalancer ? 0 : 1
 }
 
+data "hcloud_ssh_keys" "admin_keys" {
+  with_selector = var.ssh_key_selector
+}
+
 resource "hcloud_network" "net" {
   name     = var.cluster_name
   ip_range = var.ip_range
@@ -113,7 +117,7 @@ resource "hcloud_server" "control_plane" {
   location           = element(var.control_plane_datacenters, count.index % (length(var.control_plane_datacenters)))
   placement_group_id = hcloud_placement_group.control_plane.id
 
-  ssh_keys = var.ssh_keys
+  ssh_keys = length(var.ssh_keys) > 0 ? var.ssh_keys : data.hcloud_ssh_keys.admin_keys.ssh_keys.*.name
 
   labels = {
     "kubeone_cluster_name" = var.cluster_name

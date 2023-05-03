@@ -42,8 +42,15 @@ variable "worker_os" {
 }
 
 variable "ssh_keys" {
-  description = "List of SSH keys that will have access to the server."
+  description = "List of SSH keys that will have access to the server. If none are given, existing SSH keys in Hetzner will be used."
   type        = list(string)
+  default     = []
+}
+
+variable "ssh_key_selector" {
+  description = "Selector to use when automatically pulling existing SSH keys."
+  type        = string
+  default     = "role=admin"
 }
 
 variable "ssh_port" {
