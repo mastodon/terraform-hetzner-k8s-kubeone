@@ -80,7 +80,7 @@ variable "disable_kubeapi_loadbalancer" {
 # Provider specific settings
 
 variable "control_plane_type" {
-  default = "cx21"
+  default = "cx22"
   type    = string
 }
 
