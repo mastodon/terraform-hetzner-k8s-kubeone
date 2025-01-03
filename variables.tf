@@ -90,7 +90,7 @@ variable "control_plane_replicas" {
 }
 
 variable "control_plane_datacenters" {
-  default = ["fsn1", "nbg1", "hel1"]
+  default = ["fsn1"]
   type = list(string)
 }
 

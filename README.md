@@ -43,7 +43,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_apiserver_alternative_names"></a> [apiserver\_alternative\_names](#input\_apiserver\_alternative\_names) | subject alternative names for the API Server signing cert. | `list(string)` | `[]` | no |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | prefix for cloud resources | `string` | n/a | yes |
-| <a name="input_control_plane_datacenters"></a> [control\_plane\_datacenters](#input\_control\_plane\_datacenters) | n/a | `list(string)` | <pre>[<br>  "fsn1",<br>  "nbg1",<br>  "hel1"<br>]</pre> | no |
+| <a name="input_control_plane_datacenters"></a> [control\_plane\_datacenters](#input\_control\_plane\_datacenters) | n/a | `list(string)` | <pre>[<br>  "fsn1"<br>]</pre> | no |
 | <a name="input_control_plane_replicas"></a> [control\_plane\_replicas](#input\_control\_plane\_replicas) | n/a | `number` | `3` | no |
 | <a name="input_control_plane_source_ips"></a> [control\_plane\_source\_ips](#input\_control\_plane\_source\_ips) | List of IPs that are allowed to connect to the control instances | `list(string)` | n/a | yes |
 | <a name="input_control_plane_type"></a> [control\_plane\_type](#input\_control\_plane\_type) | n/a | `string` | `"cx22"` | no |
